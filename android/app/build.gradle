@@ -56,14 +56,7 @@ android {
         versionName = flutterVersionName
     }
 
-//    signingConfigs {
-//        release {
-//            keyAlias 'quotes'
-//            keyPassword '123456'
-//            storeFile file('/Users/ramangoswami/Code/Personal/Flutter/DailyQuotes/android/app/quotes.jks')
-//            storePassword '123456'
-//        }
-//    }
+
 
 
     signingConfigs {
