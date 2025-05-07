@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:share_plus/share_plus.dart';
 import 'dart:math';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 class QuotesPage extends StatefulWidget {
   @override
@@ -13,6 +13,7 @@ class _QuotesPageState extends State<QuotesPage> {
   String _quote = "Tap to load a quote";
   bool _isLoading = false;
   List<Color> quoteBackground = [];
+  DateTime? _lastApiCallTime;
 
   @override
   void initState() {
@@ -26,23 +27,34 @@ class _QuotesPageState extends State<QuotesPage> {
       _isLoading = true;
     });
 
+    if (_lastApiCallTime != null && DateTime.now().difference(_lastApiCallTime!).inSeconds < 30) {
+      setState(() {
+        _quote = "Please wait 30 seconds before fetching a new quote.";
+        quoteBackground = getRandomDeepPurpleGradient();
+        _isLoading = false;
+      });
+      return;
+    }
+
     try {
-      final response = await http.get(Uri.parse('https://zenquotes.io/api/random'));
+      final response = await http.get(Uri.parse('https://favqs.com/api/qotd'));
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
-        if (data is List && data.isNotEmpty) {
-          setState(() {
-            _quote = '${data[0]['q']}\n\n- ${data[0]['a']}';
-            quoteBackground = getRandomDeepPurpleGradient();
-          });
-        } else {
-          setState(() => _quote = 'No quote found.');
-        }
+        final quoteData = data['quote'];
+        setState(() {
+          _quote = '${quoteData['body']}\n\n- ${quoteData['author']}';
+          quoteBackground = getRandomDeepPurpleGradient();
+          _lastApiCallTime = DateTime.now();
+        });
       } else {
-        setState(() => _quote = 'You can request new quotes in 30 seconds. Please try again later.');
+        setState(() {
+          _quote = 'Failed to fetch quote. Please try again later.';
+        });
       }
     } catch (e) {
-      setState(() => _quote = 'Error: $e');
+      setState(() {
+        _quote = 'Error: $e';
+      });
     } finally {
       setState(() => _isLoading = false);
     }
@@ -126,9 +138,15 @@ class _QuotesPageState extends State<QuotesPage> {
         onPressed: _fetchQuote,
         icon: const Icon(Icons.refresh),
         label: const Text("New Quote"),
-
       ),
-
+      bottomNavigationBar: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Text(
+          'Quotes powered by FavQs.com',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Colors.black, fontSize: 12),
+        ),
+      ),
     );
   }
 }
