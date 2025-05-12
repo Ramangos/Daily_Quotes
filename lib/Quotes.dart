@@ -27,14 +27,14 @@ class _QuotesPageState extends State<QuotesPage> {
       _isLoading = true;
     });
 
-    if (_lastApiCallTime != null && DateTime.now().difference(_lastApiCallTime!).inSeconds < 30) {
-      setState(() {
-        _quote = "Please wait 30 seconds before fetching a new quote.";
-        quoteBackground = getRandomDeepPurpleGradient();
-        _isLoading = false;
-      });
-      return;
-    }
+    // if (_lastApiCallTime != null && DateTime.now().difference(_lastApiCallTime!).inSeconds < 30) {
+    //   setState(() {
+    //     _quote = "Please wait 30 seconds before fetching a new quote.";
+    //     quoteBackground = getRandomDeepPurpleGradient();
+    //     _isLoading = false;
+    //   });
+    //   return;
+    // }
 
     try {
       final response = await http.get(Uri.parse('https://favqs.com/api/qotd'));
